@@ -142,3 +142,6 @@ pretrained
 YOLOX_outputs
 visual_yolox_x
 exp/
+trial_data/
+dataset/
+output.avi
