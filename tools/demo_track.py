@@ -11,7 +11,8 @@ from yolox.data.data_augment import preproc
 from yolox.exp import get_exp
 from yolox.utils import fuse_model, get_model_info, postprocess
 from yolox.utils.visualize import plot_tracking
-from yolox.tracker.byte_tracker import BYTETracker
+# from yolox.tracker.byte_tracker import BYTETracker
+from yolox.byte_tracker.byte_tracker import BYTETracker
 from yolox.tracking_utils.timer import Timer
 
 
@@ -284,6 +285,10 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
                 online_im = img_info['raw_img']
             if args.save_result:
                 vid_writer.write(online_im)
+                res_file = osp.join(vis_folder, f"{timestamp}.txt")
+                with open(res_file, 'w') as f:
+                    f.writelines(results)
+
             ch = cv2.waitKey(1)
             if ch == 27 or ch == ord("q") or ch == ord("Q"):
                 break
@@ -322,9 +327,13 @@ def main(exp, args):
     if args.tsize is not None:
         exp.test_size = (args.tsize, args.tsize)
 
+    logger.info("L330")
+
     model = exp.get_model().to(args.device)
     logger.info("Model Summary: {}".format(get_model_info(model, exp.test_size)))
     model.eval()
+
+    logger.info("L330")
 
     if not args.trt:
         if args.ckpt is None:
@@ -356,6 +365,8 @@ def main(exp, args):
     else:
         trt_file = None
         decoder = None
+
+    logger.info("L365")
 
     predictor = Predictor(model, exp, trt_file, decoder, args.device, args.fp16)
     current_time = time.localtime()
